@@ -1,56 +1,99 @@
-import {
-  Link as ChakraLink,
-  Text,
-  Code,
-  List,
-  ListIcon,
-  ListItem,
-} from '@chakra-ui/core'
-import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
+import { Box, Button, Flex, Heading, Link, Stack, Text } from '@chakra-ui/core';
+import { withUrqlClient } from 'next-urql';
+import NextLink from 'next/link';
+import React, { useState } from 'react';
+import { EditDeletePostButtons } from '../components/EditDeletePostButtons';
+import { Layout } from '../components/Layout';
+import { UpdootSection } from '../components/UpdootSection';
+import { useMeQuery, usePostsQuery } from '../generated/graphql';
+import { createUrqlClient } from '../utils/createUrqlClient';
+const Index = () => {
+    const [variables, setVariables] = useState({
+        limit: 15,
+        cursor: null as null | string
+    });
+    const [{ data: meData }] = useMeQuery();
+    const [{ data, error, fetching }] = usePostsQuery({
+        variables
+    });
 
-import { Hero } from '../components/Hero'
-import { Container } from '../components/Container'
-import { Main } from '../components/Main'
-import { DarkModeSwitch } from '../components/DarkModeSwitch'
-import { CTA } from '../components/CTA'
-import { Footer } from '../components/Footer'
+    if (!fetching && !data) {
+        return (
+            <div>
+                <div>you got query failed</div>
+                <div>{error?.message}</div>
+            </div>
+        );
+    }
+    return (
+        <Layout>
+            <br />
+            {!data && fetching ? (
+                <div>Loading...</div>
+            ) : (
+                <Stack spacing={8}>
+                    {data!.posts.posts.map(p =>
+                        !p ? null : (
+                            <Flex
+                                key={p.id}
+                                p={5}
+                                shadow='md'
+                                borderWidth='1px'
+                            >
+                                <UpdootSection post={p} />
+                                <Box flex={1}>
+                                    <NextLink
+                                        href='/post/[id]'
+                                        as={`/post/${p.id}`}
+                                    >
+                                        <Link>
+                                            <Heading fontSize='xl'>
+                                                {p.title}
+                                            </Heading>
+                                        </Link>
+                                    </NextLink>
+                                    <Text mt={2}>
+                                        Post by {p.creator.username}
+                                    </Text>
+                                    <Flex flex={1} align='center'>
+                                        <Text mt={4}>{p.textSnippet}</Text>
+                                        {meData?.me?.id !==
+                                        p.creator.id ? null : (
+                                            <Box ml='auto'>
+                                                <EditDeletePostButtons
+                                                    id={p.id}
+                                                />
+                                            </Box>
+                                        )}
+                                    </Flex>
+                                </Box>
+                            </Flex>
+                        )
+                    )}
+                </Stack>
+            )}
+            {data && data.posts.hasMore ? (
+                <Flex>
+                    <Button
+                        onClick={() => {
+                            setVariables({
+                                limit: variables.limit,
+                                cursor:
+                                    data.posts.posts[
+                                        data.posts.posts.length - 1
+                                    ].createdAt
+                            });
+                        }}
+                        isLoading={fetching}
+                        m='auto'
+                        my={8}
+                    >
+                        Load more
+                    </Button>
+                </Flex>
+            ) : null}
+        </Layout>
+    );
+};
 
-const Index = () => (
-  <Container height="100vh">
-    <Hero />
-    <Main>
-      <Text>
-        Example repository of <Code>Next.js</Code> + <Code>chakra-ui</Code> +{' '}
-        <Code>typescript</Code>.
-      </Text>
-
-      <List spacing={3} my={0}>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink
-            isExternal
-            href="https://chakra-ui.com"
-            flexGrow={1}
-            mr={2}
-          >
-            Chakra UI <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
-            Next.js <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-      </List>
-    </Main>
-
-    <DarkModeSwitch />
-    <Footer>
-      <Text>Next ❤️ Chakra</Text>
-    </Footer>
-    <CTA />
-  </Container>
-)
-
-export default Index
+export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
