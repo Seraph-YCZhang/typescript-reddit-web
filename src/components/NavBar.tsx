@@ -1,16 +1,18 @@
-import { Box, Button, Flex, Heading, Link } from '@chakra-ui/core';
-import React from 'react';
+import { Box, Button, Flex, Heading, IconButton, Link } from '@chakra-ui/core';
+import { ChatIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import NextLink from 'next/link';
-import { useLogoutMutation, useMeQuery } from '../generated/graphql';
-import { isServer } from '../utils/isServer';
 import { useRouter } from 'next/router';
+import React from 'react';
+import { useLogoutMutation, useMeQuery } from '../generated/graphql';
+import { NavBtn } from './NavBtn';
+import { NavProfile } from './NavProfile';
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
-    const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
+
     const [{ data, fetching }] = useMeQuery();
-    const router = useRouter();
+
     let body = null;
     if (fetching) {
         body = null;
@@ -18,12 +20,14 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         body = (
             <>
                 <NextLink href='/login'>
-                    <Link mr={2} color='white'>
-                        Login
-                    </Link>
+                    <NavBtn mr={4}>
+                        <Link color='white'>Sign In</Link>
+                    </NavBtn>
                 </NextLink>
                 <NextLink href='/register'>
-                    <Link color='white'>Register</Link>
+                    <NavBtn colorScheme='blue' outline={false}>
+                        <Link color='white'>Sign Up</Link>
+                    </NavBtn>
                 </NextLink>
             </>
         );
@@ -31,19 +35,11 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         body = (
             <Flex alignItems='center'>
                 <NextLink href='/create-post'>
-                    <Link mr={4} as='button'>create post</Link>
+                    <NavBtn mr={4}>
+                        <Link as='button'>Create Post</Link>
+                    </NavBtn>
                 </NextLink>
-                <Box mr={2}>{data.me.username}</Box>
-                <Button
-                    onClick={async () => {
-                        await logout();
-                        router.reload();
-                    }}
-                    variant='link'
-                    isLoading={logoutFetching}
-                >
-                    loggout
-                </Button>
+                <NavProfile me={data.me}/>
             </Flex>
         );
     }
@@ -57,12 +53,17 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
             alignItems='center'
         >
             <Flex alignItems='center' maxW={800} flex={1} m='auto'>
-            <NextLink href='/'>
-                <Link>
-                    <Heading>Reddit</Heading>
-                </Link>
-            </NextLink>
-            <Box ml={'auto'}>{body}</Box>
+                <NextLink href='/'>
+                    <Link>
+                        <Heading>
+                            <Flex alignItems='center' color='#fff' fontFamily='cursive'>
+                                <ChatIcon mr={4} color='#fff'/>
+                                postit!
+                            </Flex>
+                        </Heading>
+                    </Link>
+                </NextLink>
+                <Box ml={'auto'}>{body}</Box>
             </Flex>
         </Flex>
     );

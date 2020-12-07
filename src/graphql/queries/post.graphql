@@ -7,6 +7,17 @@ query Post($id: Int!) {
     text
     points
     voteStatus
+    comments {
+      id
+      title
+      text
+      createdAt
+      creator {
+        id
+        username
+        createdAt
+      }
+    }
     creator {
         id
         username

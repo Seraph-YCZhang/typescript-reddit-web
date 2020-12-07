@@ -7,6 +7,7 @@ import { Layout } from '../components/Layout';
 import { UpdootSection } from '../components/UpdootSection';
 import { useMeQuery, usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
+import { format } from 'timeago.js';
 const Index = () => {
     const [variables, setVariables] = useState({
         limit: 15,
@@ -32,8 +33,9 @@ const Index = () => {
                 <div>Loading...</div>
             ) : (
                 <Stack spacing={8}>
-                    {data!.posts.posts.map(p =>
-                        !p ? null : (
+                    {data!.posts.posts.map(p => {
+                        const date: string = format(+p.createdAt);
+                        return !p ? null : (
                             <Flex
                                 key={p.id}
                                 p={5}
@@ -42,6 +44,9 @@ const Index = () => {
                             >
                                 <UpdootSection post={p} />
                                 <Box flex={1}>
+                                    <Text color='GrayText' fontSize='sm'>
+                                        Post by {p.creator.username} {date}
+                                    </Text>
                                     <NextLink
                                         href='/post/[id]'
                                         as={`/post/${p.id}`}
@@ -52,24 +57,23 @@ const Index = () => {
                                             </Heading>
                                         </Link>
                                     </NextLink>
-                                    <Text mt={2}>
-                                        Post by {p.creator.username}
-                                    </Text>
+
                                     <Flex flex={1} align='center'>
-                                        <Text mt={4}>{p.textSnippet}</Text>
+                                        <Text>{p.textSnippet}</Text>
                                         {meData?.me?.id !==
                                         p.creator.id ? null : (
                                             <Box ml='auto'>
                                                 <EditDeletePostButtons
                                                     id={p.id}
+                                                    left={false}
                                                 />
                                             </Box>
                                         )}
                                     </Flex>
                                 </Box>
                             </Flex>
-                        )
-                    )}
+                        );
+                    })}
                 </Stack>
             )}
             {data && data.posts.hasMore ? (

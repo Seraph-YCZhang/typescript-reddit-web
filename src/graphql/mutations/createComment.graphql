@@ -1,0 +1,12 @@
+mutation createComment($input:CommentInput!){
+  createComment (input:$input) {
+    id
+    createdAt
+    updatedAt
+    title
+    text
+    points
+    creatorId
+    postId
+  }
+}

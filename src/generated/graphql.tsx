@@ -46,6 +46,7 @@ export type Post = {
   voteStatus?: Maybe<Scalars['Int']>;
   creatorId: Scalars['Float'];
   creator: User;
+  comments?: Maybe<Array<Comment>>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   textSnippet: Scalars['String'];
@@ -56,6 +57,22 @@ export type User = {
   id: Scalars['Int'];
   username: Scalars['String'];
   email: Scalars['String'];
+  createdAt: Scalars['String'];
+  updatedAt: Scalars['String'];
+};
+
+export type Comment = {
+  __typename?: 'Comment';
+  id: Scalars['Int'];
+  title?: Maybe<Scalars['String']>;
+  text: Scalars['String'];
+  points: Scalars['Float'];
+  voteStatus?: Maybe<Scalars['Int']>;
+  creatorId: Scalars['Float'];
+  creator: User;
+  targetUserId?: Maybe<Scalars['Int']>;
+  targetUser: User;
+  postId: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
 };
@@ -71,6 +88,7 @@ export type Mutation = {
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
+  createComment: Comment;
 };
 
 
@@ -118,6 +136,11 @@ export type MutationLoginArgs = {
   usernameOrEmail: Scalars['String'];
 };
 
+
+export type MutationCreateCommentArgs = {
+  input: CommentInput;
+};
+
 export type PostInput = {
   title: Scalars['String'];
   text: Scalars['String'];
@@ -139,6 +162,11 @@ export type UsernamePasswordInput = {
   username: Scalars['String'];
   password: Scalars['String'];
   email: Scalars['String'];
+};
+
+export type CommentInput = {
+  text: Scalars['String'];
+  postId: Scalars['Int'];
 };
 
 export type PostSnippetFragment = (
@@ -182,6 +210,19 @@ export type ChangPasswordMutation = (
   & { changePassword: (
     { __typename?: 'UserResponse' }
     & RegularUserResponseFragment
+  ) }
+);
+
+export type CreateCommentMutationVariables = Exact<{
+  input: CommentInput;
+}>;
+
+
+export type CreateCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { createComment: (
+    { __typename?: 'Comment' }
+    & Pick<Comment, 'id' | 'createdAt' | 'updatedAt' | 'title' | 'text' | 'points' | 'creatorId' | 'postId'>
   ) }
 );
 
@@ -300,7 +341,14 @@ export type PostQuery = (
   & { post?: Maybe<(
     { __typename?: 'Post' }
     & Pick<Post, 'id' | 'title' | 'createdAt' | 'updatedAt' | 'text' | 'points' | 'voteStatus'>
-    & { creator: (
+    & { comments?: Maybe<Array<(
+      { __typename?: 'Comment' }
+      & Pick<Comment, 'id' | 'title' | 'text' | 'createdAt'>
+      & { creator: (
+        { __typename?: 'User' }
+        & Pick<User, 'id' | 'username' | 'createdAt'>
+      ) }
+    )>>, creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
     ) }
@@ -373,6 +421,24 @@ export const ChangPasswordDocument = gql`
 
 export function useChangPasswordMutation() {
   return Urql.useMutation<ChangPasswordMutation, ChangPasswordMutationVariables>(ChangPasswordDocument);
+};
+export const CreateCommentDocument = gql`
+    mutation createComment($input: CommentInput!) {
+  createComment(input: $input) {
+    id
+    createdAt
+    updatedAt
+    title
+    text
+    points
+    creatorId
+    postId
+  }
+}
+    `;
+
+export function useCreateCommentMutation() {
+  return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const CreatePostDocument = gql`
     mutation createPost($input: PostInput!) {
@@ -484,6 +550,17 @@ export const PostDocument = gql`
     text
     points
     voteStatus
+    comments {
+      id
+      title
+      text
+      createdAt
+      creator {
+        id
+        username
+        createdAt
+      }
+    }
     creator {
       id
       username

@@ -5,14 +5,16 @@ import NextLink from 'next/link';
 import { useDeletePostMutation } from '../generated/graphql';
 interface EditDeletePostButtonsProps {
     id: number;
+    left: boolean;
 }
 
 export const EditDeletePostButtons: React.FC<EditDeletePostButtonsProps> = ({
-    id
+    id,
+    left
 }) => {
     const [, deletePost] = useDeletePostMutation();
     return (
-        <Box>
+        <Box textAlign={left ? 'end' : 'start'}>
             <NextLink href='/post/edit/[id]' as={`/post/edit/${id}`}>
                 <IconButton
                     mr={2}
