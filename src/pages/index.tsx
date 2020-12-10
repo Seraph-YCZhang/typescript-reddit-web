@@ -28,77 +28,113 @@ const Index = () => {
         );
     }
     return (
-        <Layout>
-            <Header title='the front page of posts'/>
-            <br />
-            {!data && fetching ? (
-                <div>Loading...</div>
-            ) : (
-                <Stack spacing={8}>
-                    {data!.posts.posts.map(p => {
-                        const date: string = format(+p.createdAt);
-                        return !p ? null : (
-                            <Flex
-                                key={p.id}
-                                p={5}
-                                shadow='md'
-                                borderWidth='1px'
-                            >
-                                <UpdootSection post={p} />
-                                <Box flex={1}>
-                                    <Text color='GrayText' fontSize='sm'>
-                                        Post by {p.creator.username} {date}
-                                    </Text>
-                                    <NextLink
-                                        href='/post/[id]'
-                                        as={`/post/${p.id}`}
-                                    >
-                                        <Link>
-                                            <Heading fontSize='xl'>
-                                                {p.title}
-                                            </Heading>
-                                        </Link>
-                                    </NextLink>
+        <>
+            <Flex
+                position='absolute'
+                height={450}
+                zIndex={2}
+                top={-150}
+                width='100%'
+                align='center'
+            >
+                <Box
+                    height='100%'
+                    transform='skewY(-10deg)'
+                    position='absolute'
+                    background='tomato'
+                    width='100%'
+                />
+                <Box
+                    pos='relative'
+                    top='20px'
+                    alignSelf='flex-end'
+                    ml={20}
+                    color='#3a3a3a'
+                    fontSize='86px'
+                    fontWeight='700'
+                >
+                    Post something you want to share
+                </Box>
+            </Flex>
+            <Layout>
+                <Header title='the front page of posts' />
 
-                                    <Flex flex={1} align='center'>
-                                        <Text>{p.textSnippet}</Text>
-                                        {meData?.me?.id !==
-                                        p.creator.id ? null : (
-                                            <Box ml='auto'>
-                                                <EditDeletePostButtons
-                                                    id={p.id}
-                                                    left={false}
-                                                />
-                                            </Box>
-                                        )}
+                <br />
+                {!data && fetching ? (
+                    <div>Loading...</div>
+                ) : (
+                    <Box mt={280}>
+                        <Stack spacing={8}>
+                            {data!.posts.posts.map(p => {
+                                const date: string = format(+p.createdAt);
+                                return !p ? null : (
+                                    <Flex
+                                        key={p.id}
+                                        p={5}
+                                        shadow='md'
+                                        borderWidth='1px'
+                                    >
+                                        <UpdootSection post={p} />
+                                        <Box flex={1}>
+                                            <Text
+                                                color='GrayText'
+                                                fontSize='sm'
+                                            >
+                                                Post by {p.creator.username}{' '}
+                                                {date}
+                                            </Text>
+                                            <NextLink
+                                                href='/post/[id]'
+                                                as={`/post/${p.id}`}
+                                            >
+                                                <Link>
+                                                    <Heading fontSize='xl'>
+                                                        {p.title}
+                                                    </Heading>
+                                                </Link>
+                                            </NextLink>
+
+                                            <Flex flex={1} align='center'>
+                                                <Text>{p.textSnippet}</Text>
+                                                {meData?.me?.id !==
+                                                p.creator.id ? null : (
+                                                    <Box ml='auto'>
+                                                        <EditDeletePostButtons
+                                                            id={p.id}
+                                                            left={false}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            </Flex>
+                                        </Box>
                                     </Flex>
-                                </Box>
-                            </Flex>
-                        );
-                    })}
-                </Stack>
-            )}
-            {data && data.posts.hasMore ? (
-                <Flex>
-                    <Button
-                        onClick={() => {
-                            setVariables({
-                                limit: variables.limit,
-                                cursor:
-                                    data.posts.posts[
-                                        data.posts.posts.length - 1
-                                    ].createdAt
-                            });
-                        }}
-                        isLoading={fetching}
-                        m='auto'
-                        my={8}
-                    >
-                        Load more
-                    </Button>
-                </Flex>
-            ) : null}
-        </Layout>
+                                );
+                            })}
+                        </Stack>
+                    </Box>
+                )}
+                {data && data.posts.hasMore ? (
+                    <Flex>
+                        <Button
+                            onClick={() => {
+                                setVariables({
+                                    limit: variables.limit,
+                                    cursor:
+                                        data.posts.posts[
+                                            data.posts.posts.length - 1
+                                        ].createdAt
+                                });
+                            }}
+                            isLoading={fetching}
+                            m='auto'
+                            my={8}
+                        >
+                            Load more
+                        </Button>
+                    </Flex>
+                ) : null}
+            </Layout>
+        </>
     );
 };
 
