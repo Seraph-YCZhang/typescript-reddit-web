@@ -48,7 +48,7 @@ const Post = ({}) => {
             </Box>
             <EditDeletePostButtons id={data.post.id} left={true} />
             {data.post.files?.map(img => (
-                <Img key={img.id} src={img.url} />
+                <Img key={img.id} src={img.url} borderRadius="lg" />
             ))}
             <Flex alignItems='center'>
                 {openComment ? (

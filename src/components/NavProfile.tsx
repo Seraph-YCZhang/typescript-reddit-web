@@ -40,6 +40,7 @@ export const NavProfile: React.FC<NavProfileProps> = ({ me }) => {
                 as={Button}
                 rightIcon={<ChevronDownIcon />}
                 _focus={{ outline: 0, boxShadow: 'outline' }}
+                p={[1/4,1/2,1]}
             >
                 <Icon as={CgProfile} mr={4} w={6} h={6}/>
                 {me?.username}

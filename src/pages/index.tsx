@@ -48,9 +48,9 @@ const Index = () => {
                     pos='relative'
                     top='20px'
                     alignSelf='flex-end'
-                    ml={20}
+                    ml={[10,20]}
                     color='#3a3a3a'
-                    fontSize='86px'
+                    fontSize={['42px', '72px', '86px']}
                     fontWeight='700'
                 >
                     Post something you want to share

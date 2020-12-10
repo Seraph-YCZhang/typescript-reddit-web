@@ -19,6 +19,7 @@ export const NavBtn: React.FC<NavBtnProp> = forwardRef(
                 color='#ffffff'
                 _hover={{ color: 'tomato', backgroundColor: '#ffffff' }}
                 justifyContent='center'
+                p={[1/4,1/2,1]}
                 {...otherprops}
             >
                 {children}
