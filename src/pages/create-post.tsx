@@ -1,4 +1,4 @@
-import { Box, Button } from '@chakra-ui/core';
+import { Box, Button, Input } from '@chakra-ui/core';
 import { Form, Formik } from 'formik';
 import React, { useEffect } from 'react';
 import { InputField } from '../components/InputField';
@@ -8,22 +8,26 @@ import { withUrqlClient } from 'next-urql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import { Layout } from '../components/Layout';
 import { userIsAuth } from '../utils/useIsAuth';
+import Header from '../components/Header';
 const createPost: React.FC<{}> = ({}) => {
     const [, createPost] = useCreatePostMutation();
     const router = useRouter();
     userIsAuth();
     return (
         <Layout variant='small'>
+            <Header title='create post' />
             <Formik
-                initialValues={{ title: '', text: '' }}
+                initialValues={{ title: '', text: '', file: null }}
                 onSubmit={async (values, { setErrors }) => {
-                    const { error } = await createPost({ input: values });
+                    console.log(values);
+                    const { error } = await createPost({ ...values });
+                    console.log(error);
                     if (!error) {
                         router.push('/');
                     }
                 }}
             >
-                {({ values, handleChange, isSubmitting }) => (
+                {({ values, setFieldValue, isSubmitting }) => (
                     <Form>
                         <InputField
                             name='title'
@@ -38,6 +42,17 @@ const createPost: React.FC<{}> = ({}) => {
                                 textarea
                             />
                         </Box>
+                        <Input
+                            type='file'
+                            accept='image/*'
+                            multiple
+                            onChange={({ target: { validity, files } }) => {
+                                if (validity.valid && files) {
+                                    console.log(files[0]);
+                                    setFieldValue('file', files[0]);
+                                }
+                            }}
+                        />
 
                         <Button
                             mt={4}

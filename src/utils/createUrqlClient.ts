@@ -9,7 +9,6 @@ import {
     LogoutMutation,
     MeDocument,
     MeQuery,
-    Post,
     RegisterMutation,
     VoteMutationVariables
 } from '../generated/graphql';
@@ -17,6 +16,7 @@ import { betterUpdateQuery } from './betterUpdateQuery';
 import { stringifyVariables } from '@urql/core';
 import gql from 'graphql-tag';
 import { isServer } from './isServer';
+import { multipartFetchExchange } from '@urql/exchange-multipart-fetch';
 
 const errorExchange: Exchange = ({ forward }) => ops$ => {
     return pipe(
@@ -214,7 +214,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
             }),
             errorExchange,
             ssrExchange,
-            fetchExchange
+            multipartFetchExchange
         ]
     };
 };

@@ -1,10 +1,11 @@
-import { Box, Flex, Heading, IconButton, Text } from '@chakra-ui/core';
+import { Box, Flex, Heading, IconButton, Img, Text } from '@chakra-ui/core';
 import { ChatIcon, ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import React, { useState } from 'react';
 import { format } from 'timeago.js';
 import { EditDeletePostButtons } from '../../components/EditDeletePostButtons';
+import Header from '../../components/Header';
 import { InputField } from '../../components/InputField';
 import { Layout } from '../../components/Layout';
 import { useCreateCommentMutation, useMeQuery } from '../../generated/graphql';
@@ -35,6 +36,7 @@ const Post = ({}) => {
     }
     return (
         <Layout>
+            <Header title={data.post.title} />
             <Text color='GrayText' fontSize='sm'>
                 Post by {data.post.creator.username}{' '}
                 {format(data.post.createdAt)}
@@ -45,6 +47,9 @@ const Post = ({}) => {
                 {data.post.text}
             </Box>
             <EditDeletePostButtons id={data.post.id} left={true} />
+            {data.post.files?.map(img => (
+                <Img key={img.id} src={img.url} />
+            ))}
             <Flex alignItems='center'>
                 {openComment ? (
                     <IconButton

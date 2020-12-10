@@ -36,7 +36,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
             <Flex alignItems='center'>
                 <NextLink href='/create-post'>
                     <NavBtn mr={4}>
-                        <Link as='button'>Create Post</Link>
+                        <Link>Create Post</Link>
                     </NavBtn>
                 </NextLink>
                 <NavProfile me={data.me}/>

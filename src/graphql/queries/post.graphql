@@ -22,5 +22,10 @@ query Post($id: Int!) {
         id
         username
     }
+    files {
+      id
+      url
+      filename
+    }
   }
 }

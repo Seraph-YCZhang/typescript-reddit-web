@@ -1,24 +1,28 @@
 import { Button } from '@chakra-ui/core';
-import React, { FunctionComponent } from 'react';
+import React, { forwardRef } from 'react';
 interface NavBtnProp {
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  isLoading?: boolean;
-  mr?:string|number;
-  colorScheme?:string;
-  outline?:boolean;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    isLoading?: boolean;
+    mr?: string | number;
+    colorScheme?: string;
+    outline?: boolean;
 }
-export const NavBtn: FunctionComponent<NavBtnProp> = ({ children, outline = true, ...otherprop}) => {
-    return (
-        <Button
-            variant={outline?'outline':''}
-            border='1px solid white'
-            borderRadius='5px'
-            color='#ffffff'
-            _hover={{ color: 'tomato', backgroundColor: '#ffffff' }}
-            justifyContent='center'
-            {...otherprop}
-        >
-            {children}
-        </Button>
-    );
-};
+// @ts-ignore
+export const NavBtn: React.FC<NavBtnProp> = forwardRef(
+    ({ children, outline = true, ...otherprops }, ref) => {
+        return (
+            <Button
+                ref={ref as any}
+                variant={outline ? 'outline' : ''}
+                border='1px solid white'
+                borderRadius='5px'
+                color='#ffffff'
+                _hover={{ color: 'tomato', backgroundColor: '#ffffff' }}
+                justifyContent='center'
+                {...otherprops}
+            >
+                {children}
+            </Button>
+        );
+    }
+);

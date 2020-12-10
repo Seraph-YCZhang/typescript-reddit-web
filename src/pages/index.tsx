@@ -8,6 +8,7 @@ import { UpdootSection } from '../components/UpdootSection';
 import { useMeQuery, usePostsQuery } from '../generated/graphql';
 import { createUrqlClient } from '../utils/createUrqlClient';
 import { format } from 'timeago.js';
+import Header from '../components/Header';
 const Index = () => {
     const [variables, setVariables] = useState({
         limit: 15,
@@ -28,6 +29,7 @@ const Index = () => {
     }
     return (
         <Layout>
+            <Header title='the front page of posts'/>
             <br />
             {!data && fetching ? (
                 <div>Loading...</div>

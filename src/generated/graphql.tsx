@@ -10,6 +10,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: any;
 };
 
 export type Query = {
@@ -47,6 +49,7 @@ export type Post = {
   creatorId: Scalars['Float'];
   creator: User;
   comments?: Maybe<Array<Comment>>;
+  files?: Maybe<Array<File>>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   textSnippet: Scalars['String'];
@@ -77,6 +80,17 @@ export type Comment = {
   updatedAt: Scalars['String'];
 };
 
+export type File = {
+  __typename?: 'File';
+  id: Scalars['Int'];
+  postId: Scalars['Int'];
+  post: Post;
+  url: Scalars['String'];
+  filename: Scalars['String'];
+  mimetype: Scalars['String'];
+  encoding: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   vote: Scalars['Boolean'];
@@ -99,7 +113,9 @@ export type MutationVoteArgs = {
 
 
 export type MutationCreatePostArgs = {
-  input: PostInput;
+  file?: Maybe<Scalars['Upload']>;
+  title: Scalars['String'];
+  text: Scalars['String'];
 };
 
 
@@ -141,10 +157,6 @@ export type MutationCreateCommentArgs = {
   input: CommentInput;
 };
 
-export type PostInput = {
-  title: Scalars['String'];
-  text: Scalars['String'];
-};
 
 export type UserResponse = {
   __typename?: 'UserResponse';
@@ -227,7 +239,9 @@ export type CreateCommentMutation = (
 );
 
 export type CreatePostMutationVariables = Exact<{
-  input: PostInput;
+  text: Scalars['String'];
+  title: Scalars['String'];
+  file: Scalars['Upload'];
 }>;
 
 
@@ -351,7 +365,10 @@ export type PostQuery = (
     )>>, creator: (
       { __typename?: 'User' }
       & Pick<User, 'id' | 'username'>
-    ) }
+    ), files?: Maybe<Array<(
+      { __typename?: 'File' }
+      & Pick<File, 'id' | 'url' | 'filename'>
+    )>> }
   )> }
 );
 
@@ -441,8 +458,8 @@ export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const CreatePostDocument = gql`
-    mutation createPost($input: PostInput!) {
-  createPost(input: $input) {
+    mutation createPost($text: String!, $title: String!, $file: Upload!) {
+  createPost(text: $text, title: $title, file: $file) {
     id
     createdAt
     updatedAt
@@ -564,6 +581,11 @@ export const PostDocument = gql`
     creator {
       id
       username
+    }
+    files {
+      id
+      url
+      filename
     }
   }
 }
