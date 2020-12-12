@@ -39,18 +39,35 @@ export interface PaginationParams {
 
 export const cursorPagination = (): Resolver => {
     return (_parent, fieldArgs, cache, info) => {
+        console.log(fieldArgs)
+        
         const { parentKey: entityKey, fieldName } = info;
         const allFields = cache.inspectFields(entityKey);
         console.log(allFields);
-        const fieldInfos = allFields.filter(
+        let fieldInfos = allFields.filter(
             info => info.fieldName === fieldName
         );
+        const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`;
+        console.log(fieldKey)
+        if(typeof fieldArgs.filter === 'string' && fieldArgs.filter.length > 0) {
+            // invalidateAllPosts(cache);
+            // return undefined;
+            console.log(fieldInfos)
+            console.log(`"filter":("${fieldArgs.filter}")`)
+            fieldInfos = fieldInfos.filter(
+                info => info.fieldKey.includes(`"filter":"${fieldArgs.filter}"`)
+            );
+        } else {
+            fieldInfos = fieldInfos.filter(
+                info => (!info.fieldKey.includes('filter')) || info.fieldKey.includes(`"filter":""`)
+            );
+        }
         const size = fieldInfos.length;
         if (size === 0) {
             return undefined;
         }
-        console.log(allFields);
-        const fieldKey = `${fieldName}(${stringifyVariables(fieldArgs)})`;
+        console.log(fieldInfos);
+        
         const isItInTheCache = cache.resolve(
             cache.resolveFieldByKey(entityKey, fieldKey) as string,
             'posts'
